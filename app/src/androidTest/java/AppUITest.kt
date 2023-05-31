@@ -1,11 +1,13 @@
 import FirstPage.Companion.FIRST_TEXT
+import SecondPage.Companion.LOGIN_HINT
+import SecondPage.Companion.PASSWORD_HINT
 import SecondPage.Companion.TEST_LOGIN
 import SecondPage.Companion.TEST_PASSWORD
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.UiDevice
-import io.github.kakaocup.kakao.screen.Screen
+import com.kaspersky.kaspresso.internal.systemscreen.NotificationsFullScreen.pressBack
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,9 +19,6 @@ class AppUITest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    private val device: UiDevice =
-        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-
     @Test
     fun checkShowPasswordError() {
         with(FirstPage()) {
@@ -28,7 +27,7 @@ class AppUITest {
         with(SecondPage()) {
             enterLogin(TEST_LOGIN)
             pressSubmitButton()
-            checkText("Password field must be filled!")
+            assert(checkText("Password field must be filled!"))
         }
     }
 
@@ -40,39 +39,39 @@ class AppUITest {
         with(SecondPage()) {
             enterPassword(TEST_PASSWORD)
             pressSubmitButton()
-            checkText("Login field must be filled!")
+            assert(checkText("Login field must be filled!"))
         }
     }
 
     @Test
-    fun checkShowAllFieldsError() {
+    fun checkShowAllFieldsEmptyError() {
         with(FirstPage()) {
             pressNextButton()
         }
         with(SecondPage()) {
             pressSubmitButton()
-            checkText("Both of fields must be filled!")
+            assert(checkText("Both of fields must be filled!"))
         }
     }
 
     @Test
-    fun checkShowDialogAfterDialogButton() { // хз
+    fun checkShowDialogAfterDialogButton() {
         with(FirstPage()) {
             pressDialogButton()
-            checkText("Важное сообщение")
-            checkText("Теперь ты автоматизатор")
+            waiting()
+            assert(titleDialog.exists())
+            assert(messageDialog.exists())
         }
     }
 
     @Test
-    fun checkNoShowDialog() { // хз
+    fun checkNoShowDialog() {
         with(FirstPage()) {
             pressDialogButton()
-        }
-        device.pressBack()
-        Screen.idle(2000L)
-        with(SecondPage()) {
-            checkText("Важное сообщение")
+            pressBack()
+            waiting()
+            assertFalse(titleDialog.exists())
+            assertFalse(messageDialog.exists())
         }
     }
 
@@ -86,12 +85,12 @@ class AppUITest {
             pressPreviousButton()
         }
         with(FirstPage()) {
-            checkText(FIRST_TEXT)
+            assert(checkText(FIRST_TEXT))
         }
     }
 
     @Test
-    fun checkNoLoginNoPassword() { // хз
+    fun checkNoLoginNoPasswordView() {
         with(FirstPage()) {
             pressNextButton()
         }
@@ -104,7 +103,8 @@ class AppUITest {
             pressNextButton()
         }
         with(SecondPage()) {
-
+            assertEquals(LOGIN_HINT, loginFieldObject.text)
+            assertEquals(PASSWORD_HINT, passwordFieldObject.text)
         }
     }
 }

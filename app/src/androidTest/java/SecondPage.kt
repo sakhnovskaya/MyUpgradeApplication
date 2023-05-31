@@ -1,9 +1,6 @@
-import BasePage.Companion.waitingTimeOut
 import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 
-class SecondPage: BasePage() {
+class SecondPage : BasePage() {
 
     private val submitButtonSelector =
         By.res("ru.tinkoff.myupgradeapplication:id/button_submit")
@@ -15,6 +12,9 @@ class SecondPage: BasePage() {
     private val enterPasswordSelector =
         By.res("ru.tinkoff.myupgradeapplication:id/edittext_password")
 
+    val loginFieldObject = waitAndFindObject(enterLoginSelector)
+    val passwordFieldObject = waitAndFindObject(enterPasswordSelector)
+
     fun pressSubmitButton() {
         pressButton(submitButtonSelector)
     }
@@ -24,19 +24,17 @@ class SecondPage: BasePage() {
     }
 
     fun enterLogin(loginValue: String) {
-        device
-            .wait(Until.findObject(enterLoginSelector), waitingTimeOut)
-            .text = loginValue
+        loginFieldObject.text = loginValue
     }
 
     fun enterPassword(passwordValue: String) {
-        device
-            .wait(Until.findObject(enterPasswordSelector), waitingTimeOut)
-            .text = passwordValue
+        passwordFieldObject.text = passwordValue
     }
 
     companion object {
         const val TEST_LOGIN = "Lisa"
         const val TEST_PASSWORD = "Tinkoff"
+        const val LOGIN_HINT = "Login"
+        const val PASSWORD_HINT = "Password"
     }
 }
